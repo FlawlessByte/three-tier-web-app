@@ -79,7 +79,7 @@ jobs:
           context: ./src/services/backend/
           file: ./src/services/backend/ops/build/Dockerfile
           push: true
-          tags: "${CONTAINER_REGISTRY}:${VERSION}"
+          tags: "392347600144.dkr.ecr.eu-west-2.amazonaws.com/backend:${{ github.ref_name }}-${{ github.run_id }}.${{ github.run_number }}.${{ github.run_attempt }}"
           # arm64 can be added here
           platforms: linux/amd64
 
