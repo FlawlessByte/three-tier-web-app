@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: ops/build/Dockerfile
+    container_name: api-server
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - DB=node-app
+      - DBUSER=postgres
+      - DBPASS=password
+      - DBHOST=db
+      - DBPORT=5432
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15-alpine
+    container_name: postgres-db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: node-app
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  db_data:

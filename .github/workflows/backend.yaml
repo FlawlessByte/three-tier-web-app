@@ -1,0 +1,100 @@
+# 
+# GitHub Actions workflow.
+#
+# Automatically deploys the "backend" microservice on push.
+#
+
+name: Deploy backend
+
+on:
+  push:
+    branches: 
+      - main
+      - release
+    paths:
+      - 'src/services/backend/**'
+    # tags:
+    #   - 'v*.*.*' 
+  workflow_dispatch:
+
+jobs:
+
+  publish:
+    runs-on: ubuntu-latest
+    # timeout-minutes: 5
+    
+    env:
+      VERSION: ${{ github.ref_name }}-${{ github.run_id }}.${{ github.run_number }}.${{ github.run_attempt }}
+      ARGOCD_REVISION: ${{ github.ref_name }}
+      CONTAINER_REGISTRY: ${{ vars.CONTAINER_REGISTRY }}
+      ARGOCD_APP_NAME: backend-prod-euw2-shared1
+      ARGOCD_SERVER: ${{ vars.ARGOCD_SERVER }}
+      ARGOCD_TOKEN: ${{ secrets.ARGOCD_TOKEN }}
+    
+    steps:
+      
+      # Checks-out your repository under $GITHUB_WORKSPACE.
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set Up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '16.x'
+
+      - name: Install Dependencies & Run Tests
+        run: |
+          npm install
+          npm test
+
+    #   - name: Get Version
+    #     id: get_version
+    #     uses: battila7/get-version-action@v2
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-2
+
+      - name: Log in to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: all
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # adds multi-arch support
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./src/services/backend/
+          file: ./src/services/backend/ops/build/Dockerfile
+          push: true
+          tags: |
+            $CONTAINER_REGISTRY:$VERSION
+          platforms: linux/amd64,linux/arm64
+
+      - name: Set Image Tag for Deployment
+        id: set-tag
+        run: echo "IMAGE_TAG=$CONTAINER_REGISTRY:$VERSION" >> $GITHUB_ENV
+
+      - name: Deploy via ArgoCD
+        run: |
+          curl -sSL -o argocd https://github.com/argoproj/argo-cd/releases/download/v2.0.2/argocd-linux-amd64
+          chmod +x argocd
+          ./argocd app set ${ARGOCD_APP_NAME} \
+            -p image.tag=${VERSION} \
+            --server ${ARGOCD_SERVER} \
+            --revision ${ARGOCD_REVISION} \
+            --auth-token ${ARGOCD_TOKEN} --grpc-web
+          ./argocd app sync ${ARGOCD_APP_NAME} \
+            --server ${ARGOCD_SERVER} \
+            --auth-token ${ARGOCD_TOKEN} \
+            --grpc-web

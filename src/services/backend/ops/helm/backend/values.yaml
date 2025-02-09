@@ -1,0 +1,118 @@
+# Default values for backend.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: 392347600144.dkr.ecr.eu-west-2.amazonaws.com/backend
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: false
+  className: ""
+  hosts: []
+  tls: []
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 1
+  targetCPUUtilizationPercentage: 100
+  targetMemoryUtilizationPercentage: 100
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+filebeat:
+  enabled: false
+  image:
+    repository: "public.ecr.aws/elastic/filebeat"
+    pullPolicy: IfNotPresent
+    tag: "7.13.4"
+  resources: {}
+
+# -- Minimum available pods set in PodDisruptionBudget.
+# Define either 'minAvailable' or 'maxUnavailable', never both.
+podDisruptionBudget:
+  enabled: false
+  # minAvailable: 1
+# -- Maximum unavailable pods set in PodDisruptionBudget. If set, 'minAvailable' is ignored.
+  maxUnavailable: 1
+
+externalSecrets:
+  enabled: false
+  secretStoreRef:
+    name: aws-secrets-manager-store
+    kind: ClusterSecretStore
+  target:
+    creationPolicy: Owner
+  # dataFrom:
+  #   - extract:
+  #       key: backend/EsperLatte/secrets
+  #       version: "uuid/75051d5f-aeeb-4557-a93e-3e583bc19408"
+
+commonAnnotations: {}
+
+# Refer: https://hub.docker.com/r/bitnami/pgbouncer
+env: []
+
+# -- Additional environment variables to set in the container.
+additionalContainerEnv: []
+
+envFrom: []
+
+deployment:
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 50%
+    type: RollingUpdate
+

@@ -1,0 +1,32 @@
+ingress:
+  enabled: true
+  className: nginx
+  hosts:
+    - host: backend-prod-euw2-shared1.flawlessbyte.dev
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 100Mi
+
+externalSecrets:
+  enabled: true
+  dataFrom:
+  - extract:
+      key: backend-prod-euw2-shared1
+      version: "uuid/6e28ad41-d6fb-4422-8858-6a083a4bffd5"
+
+env:
+- name: PORT
+  value: "3000"
+- name: DB
+  value: "backend"
+- name: DBUSER
+  value: "postgres"
+- name: DBHOST
+  value: "backend-prod-euw2-shared1.cva8y2qsa3qq.eu-west-2.rds.amazonaws.com"
+- name: DBPORT
+  value: "5432"
