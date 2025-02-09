@@ -94,12 +94,12 @@ jobs:
 
       - name: Deploy via ArgoCD
         run: |
-          ./argocd app set ${ARGOCD_APP_NAME} \
+          argocd app set ${ARGOCD_APP_NAME} \
             -p image.tag=${VERSION} \
             --server ${ARGOCD_SERVER} \
             --revision ${ARGOCD_REVISION} \
             --auth-token ${ARGOCD_TOKEN} --grpc-web
-          ./argocd app sync ${ARGOCD_APP_NAME} \
+          argocd app sync ${ARGOCD_APP_NAME} \
             --server ${ARGOCD_SERVER} \
             --auth-token ${ARGOCD_TOKEN} \
             --grpc-web
