@@ -79,7 +79,7 @@ jobs:
           context: ./src/services/backend/
           file: ./src/services/backend/ops/build/Dockerfile
           push: true
-          tags: ${CONTAINER_REGISTRY}:${VERSION}
+          tags: "${CONTAINER_REGISTRY}:${VERSION}"
           # arm64 can be added here
           platforms: linux/amd64
 
