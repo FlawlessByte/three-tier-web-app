@@ -79,9 +79,9 @@ jobs:
           context: ./src/services/backend/
           file: ./src/services/backend/ops/build/Dockerfile
           push: true
-          tags: |
-            $CONTAINER_REGISTRY:$VERSION
-          platforms: linux/amd64,linux/arm64
+          tags: ${CONTAINER_REGISTRY}:${VERSION}
+          # arm64 can be added here
+          platforms: linux/amd64
 
       - name: Set Image Tag for Deployment
         id: set-tag
