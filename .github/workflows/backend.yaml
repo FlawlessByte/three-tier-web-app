@@ -87,10 +87,13 @@ jobs:
         id: set-tag
         run: echo "IMAGE_TAG=$CONTAINER_REGISTRY:$VERSION" >> $GITHUB_ENV
 
+      - name: Setup ArgoCD CLI 
+        uses: imajeetyadav/argocd-cli@v1
+        with:
+          version: v2.5.7
+
       - name: Deploy via ArgoCD
         run: |
-          curl -sSL -o argocd https://github.com/argoproj/argo-cd/releases/download/v2.0.2/argocd-linux-amd64
-          chmod +x argocd
           ./argocd app set ${ARGOCD_APP_NAME} \
             -p image.tag=${VERSION} \
             --server ${ARGOCD_SERVER} \
