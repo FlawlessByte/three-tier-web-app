@@ -1,0 +1,26 @@
+ingress:
+  enabled: true
+  className: nginx
+  hosts:
+    - host: webapp-prod-euw2-shared1.flawlessbyte.dev
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 100Mi
+
+externalSecrets:
+  enabled: true
+  dataFrom:
+  - extract:
+      key: webapp-prod-euw2-shared1
+      version: "uuid/terraform-20250210042259132900000002"
+
+env:
+- name: PORT
+  value: "3000"
+- name: API_HOST
+  value: "https://backend-prod-euw2-shared1.flawlessbyte.dev"

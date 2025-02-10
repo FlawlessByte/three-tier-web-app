@@ -1,0 +1,112 @@
+# 
+# GitHub Actions workflow.
+#
+# Automatically deploys the "webapp" microservice on push.
+#
+
+name: Deploy frontend
+
+on:
+  push:
+    branches: 
+      - main
+      - release
+    paths:
+      - 'src/services/webapp/**'
+      - '.github/workflows/webapp.yaml'
+    # tags:
+    #   - 'v*.*.*' 
+  workflow_dispatch:
+
+jobs:
+
+  publish:
+    runs-on: ubuntu-latest
+    # timeout-minutes: 5
+    
+    env:
+      VERSION: ${{ github.ref_name }}-${{ github.run_id }}.${{ github.run_number }}.${{ github.run_attempt }}
+      ARGOCD_REVISION: ${{ github.ref_name }}
+      CONTAINER_REGISTRY: ${{ vars.CONTAINER_REGISTRY }}
+      ARGOCD_APP_NAME: webapp-prod-euw2-shared1
+      ARGOCD_SERVER: ${{ vars.ARGOCD_SERVER }}
+      ARGOCD_TOKEN: ${{ secrets.ARGOCD_TOKEN }}
+    
+    steps:
+      - name: Debug Environment Variables
+        run: |
+          echo "ARGOCD_SERVER=$ARGOCD_SERVER"
+          echo "ARGOCD_TOKEN=$ARGOCD_TOKEN"
+          echo "VERSION=$VERSION"
+          echo "ARGOCD_REVISION=$ARGOCD_REVISION"
+      
+      # Checks-out your repository under $GITHUB_WORKSPACE.
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set Up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+
+      - name: Install Dependencies & Run Tests
+        run: |
+          cd src/services/webapp
+          npm install
+        #   npm test
+
+    #   - name: Get Version
+    #     id: get_version
+    #     uses: battila7/get-version-action@v2
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-2
+
+      - name: Log in to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: all
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # adds multi-arch support
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./src/services/webapp/
+          file: ./src/services/webapp/ops/build/Dockerfile
+          push: true
+          tags: "392347600144.dkr.ecr.eu-west-2.amazonaws.com/webapp:${{ github.ref_name }}-${{ github.run_id }}.${{ github.run_number }}.${{ github.run_attempt }}"
+          # arm64 can be added here
+          platforms: linux/amd64
+
+      - name: Set Image Tag for Deployment
+        id: set-tag
+        run: echo "IMAGE_TAG=$CONTAINER_REGISTRY:$VERSION" >> $GITHUB_ENV
+
+      - name: Setup ArgoCD CLI 
+        uses: imajeetyadav/argocd-cli@v1
+        with:
+          version: v2.0.2
+
+      - name: Deploy via ArgoCD
+        run: |
+          set -xeu
+          argocd app set $ARGOCD_APP_NAME \
+            -p image.tag=$VERSION \
+            --server $ARGOCD_SERVER \
+            --revision $ARGOCD_REVISION \
+            --auth-token $ARGOCD_TOKEN --grpc-web
+          argocd app sync $ARGOCD_APP_NAME \
+            --server $ARGOCD_SERVER \
+            --auth-token $ARGOCD_TOKEN \
+            --grpc-web

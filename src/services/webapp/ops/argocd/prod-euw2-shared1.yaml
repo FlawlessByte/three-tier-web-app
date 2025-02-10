@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: webapp-prod-euw2-shared1
+spec:
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: toptal-webapp
+  source:
+    path: src/services/webapp/ops/helm/webapp
+    repoURL: 'git@github.com:FlawlessByte/three-tier-web-app.git'
+    targetRevision: main
+    helm:
+      releaseName: webapp-prod-euw2-shared1
+      valueFiles:
+        - values.yaml
+        - ../prod-euw2-shared1.yaml
+  project: default
+  syncPolicy:
+    automated: null
+    syncOptions:
+      - CreateNamespace=true

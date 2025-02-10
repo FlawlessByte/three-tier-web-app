@@ -131,3 +131,5 @@ dist
 
 
 .terraform
+
+node_modules

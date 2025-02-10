@@ -1,11 +1,11 @@
-# Default values for backend.
+# Default values for webapp.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
 replicaCount: 1
 
 image:
-  repository: 392347600144.dkr.ecr.eu-west-2.amazonaws.com/backend
+  repository: 392347600144.dkr.ecr.eu-west-2.amazonaws.com/webapp
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
@@ -96,8 +96,8 @@ externalSecrets:
     creationPolicy: Owner
   # dataFrom:
   #   - extract:
-  #       key: secret-name
-  #       version: "uuid/---"
+  #       key: webapp/EsperLatte/secrets
+  #       version: "uuid/75051d5f-aeeb-4557-a93e-3e583bc19408"
 
 commonAnnotations: {}
 
