@@ -130,7 +130,7 @@ if (app.get('env') === 'development') {
 
 // Production error handler
 app.use(function(err, req, res, next) {
-    res.set('Cache-Control', 'no-store');
+    // res.set('Cache-Control', 'no-store');
     res.status(err.status || 500);
     res.render('error', {
         message: err.message,
@@ -138,4 +138,4 @@ app.use(function(err, req, res, next) {
     });
 });
 
-module.exports = app;
+// module.exports = app;
