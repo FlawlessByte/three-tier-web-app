@@ -17,16 +17,16 @@ externalSecrets:
   dataFrom:
   - extract:
       key: backend-prod-euw2-shared1
-      version: "uuid/6e28ad41-d6fb-4422-8858-6a083a4bffd5"
+      version: "uuid/5cb6aa5b-019c-46d9-9fca-0e2c052bd8c4"
 
 env:
 - name: PORT
-  value: "3000"
+  value: 3000
 - name: DB
   value: "backend"
 - name: DBUSER
-  value: "postgres"
+  value: "backend_user"
 - name: DBHOST
   value: "backend-prod-euw2-shared1.cva8y2qsa3qq.eu-west-2.rds.amazonaws.com"
 - name: DBPORT
-  value: "5432"
+  value: 5432
