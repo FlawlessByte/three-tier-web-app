@@ -96,8 +96,8 @@ externalSecrets:
     creationPolicy: Owner
   # dataFrom:
   #   - extract:
-  #       key: webapp/EsperLatte/secrets
-  #       version: "uuid/75051d5f-aeeb-4557-a93e-3e583bc19408"
+  #       key: secret-name
+  #       version: "uuid/---"
 
 commonAnnotations: {}
 
