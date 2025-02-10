@@ -21,7 +21,7 @@ externalSecrets:
 
 env:
 - name: PORT
-  value: 3000
+  value: "3000"
 - name: DB
   value: "backend"
 - name: DBUSER
@@ -29,4 +29,4 @@ env:
 - name: DBHOST
   value: "backend-prod-euw2-shared1.cva8y2qsa3qq.eu-west-2.rds.amazonaws.com"
 - name: DBPORT
-  value: 5432
+  value: "5432"
