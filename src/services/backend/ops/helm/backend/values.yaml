@@ -101,13 +101,11 @@ externalSecrets:
 
 commonAnnotations: {}
 
-# Refer: https://hub.docker.com/r/bitnami/pgbouncer
 env: []
 
 # -- Additional environment variables to set in the container.
 additionalContainerEnv: []
 
-envFrom: []
 
 deployment:
   strategy:

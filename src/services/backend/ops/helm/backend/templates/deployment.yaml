@@ -64,7 +64,6 @@ spec:
           env: 
             {{- toYaml . | nindent 10 }}
           {{- end }}
-          {{- with .Values.envFrom }}
           envFrom:
-            {{- toYaml . | nindent 10 }}
-          {{- end }}
+            - secretRef:
+                name: {{ include "backend.fullname" . }}
