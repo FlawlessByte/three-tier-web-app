@@ -8,7 +8,8 @@ const conString = {
     database: process.env.DB,
     password: process.env.DBPASS,
     host: process.env.DBHOST,
-    port: process.env.DBPORT                
+    port: process.env.DBPORT,
+    ssl: false                
 };
 
 // Routes
