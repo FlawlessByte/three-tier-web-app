@@ -64,6 +64,14 @@ spec:
           env: 
             {{- toYaml . | nindent 10 }}
           {{- end }}
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3000
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 3000
           envFrom:
             - secretRef:
                 name: {{ include "webapp.fullname" . }}
