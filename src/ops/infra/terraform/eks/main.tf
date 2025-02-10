@@ -133,3 +133,27 @@ module "external_secrets_irsa_role" {
 output "external_secrets_irsa_role_arn" {
   value = module.external_secrets_irsa_role.iam_role_arn
 }
+
+module "fluentbit_irsa_role" {
+  source = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+
+  role_name              = "fluentbit-${local.name}"
+  allow_self_assume_role = true
+
+  oidc_providers = {
+    ex = {
+      provider_arn               = module.eks.oidc_provider_arn
+      namespace_service_accounts = ["amazon-cloudwatch:fluent-bit"]
+    }
+  }
+
+  role_policy_arns = {
+    AmazonEKS_CNI_Policy = "arn:aws:iam::aws:policy/CloudWatchFullAccess"
+  }
+
+  tags = local.tags
+}
+
+output "fluentbit_irsa_role_arn" {
+  value = module.fluentbit_irsa_role.iam_role_arn
+}
