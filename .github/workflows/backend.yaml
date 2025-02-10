@@ -33,6 +33,12 @@ jobs:
       ARGOCD_TOKEN: ${{ secrets.ARGOCD_TOKEN }}
     
     steps:
+      - name: Debug Environment Variables
+        run: |
+          echo "ARGOCD_SERVER=$ARGOCD_SERVER"
+          echo "ARGOCD_TOKEN=$ARGOCD_TOKEN"
+          echo "VERSION=$VERSION"
+          echo "ARGOCD_REVISION=$ARGOCD_REVISION"
       
       # Checks-out your repository under $GITHUB_WORKSPACE.
       - name: Checkout Code
@@ -94,12 +100,12 @@ jobs:
 
       - name: Deploy via ArgoCD
         run: |
-          argocd app set ${ARGOCD_APP_NAME} \
-            -p image.tag=${VERSION} \
-            --server ${ARGOCD_SERVER} \
-            --revision ${ARGOCD_REVISION} \
-            --auth-token ${ARGOCD_TOKEN} --grpc-web
-          argocd app sync ${ARGOCD_APP_NAME} \
-            --server ${ARGOCD_SERVER} \
-            --auth-token ${ARGOCD_TOKEN} \
+          argocd app set $ARGOCD_APP_NAME \
+            -p image.tag=$VERSION \
+            --server $ARGOCD_SERVER \
+            --revision $ARGOCD_REVISION \
+            --auth-token $ARGOCD_TOKEN --grpc-web
+          argocd app sync $ARGOCD_APP_NAME \
+            --server $ARGOCD_SERVER \
+            --auth-token $ARGOCD_TOKEN \
             --grpc-web
