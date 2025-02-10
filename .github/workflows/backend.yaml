@@ -96,7 +96,7 @@ jobs:
       - name: Setup ArgoCD CLI 
         uses: imajeetyadav/argocd-cli@v1
         with:
-          version: v2.5.7
+          version: v2.0.2
 
       - name: Deploy via ArgoCD
         run: |
