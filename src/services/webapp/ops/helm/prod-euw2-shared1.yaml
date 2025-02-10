@@ -22,5 +22,7 @@ externalSecrets:
 env:
 - name: PORT
   value: "3000"
-- name: API_HOST
+- name: API_DOMAIN
   value: "https://backend-prod-euw2-shared1.flawlessbyte.dev"
+- name: CLOUDFRONT_DOMAIN
+  value: d2jkunu678oi03.cloudfront.net
