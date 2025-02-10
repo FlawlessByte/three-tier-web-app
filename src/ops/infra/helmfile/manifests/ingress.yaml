@@ -1,0 +1,32 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    alb.ingress.kubernetes.io/certificate-arn: "arn:aws:acm:eu-west-2:392347600144:certificate/e5fc3266-dfda-43d2-a7ff-d2e7a655504b"
+    alb.ingress.kubernetes.io/ssl-redirect: '443'
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: instance
+    alb.ingress.kubernetes.io/healthcheck-protocol: HTTP
+    alb.ingress.kubernetes.io/ssl-policy: ELBSecurityPolicy-TLS-1-2-Ext-2018-06
+    alb.ingress.kubernetes.io/healthcheck-path: /healthz
+    alb.ingress.kubernetes.io/healthcheck-interval-seconds: '5'
+    alb.ingress.kubernetes.io/healthcheck-timeout-seconds: '4'
+    alb.ingress.kubernetes.io/load-balancer-attributes: deletion_protection.enabled=false
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
+    alb.ingress.kubernetes.io/load-balancer-name: prod-euw2-shared1-ext-nginx
+  labels:
+    app.kubernetes.io/name: prod-euw2-shared1-inc
+  name: prod-euw2-shared1-inc
+  namespace: ext-ingress-nginx
+spec:
+  ingressClassName: alb
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: ingress-nginx-prod-euw2-shared1-controller
+            port:
+              number: 80
+        path: /
+        pathType: Prefix

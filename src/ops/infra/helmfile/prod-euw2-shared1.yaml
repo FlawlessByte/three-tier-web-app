@@ -1,0 +1,102 @@
+bases:
+- helmfile.shared.yaml
+
+releases:
+- chart: ingress-nginx/ingress-nginx
+  name: ingress-nginx-prod-euw2-shared1
+  namespace: ext-ingress-nginx
+  version: "4.8.3"
+  needs:
+    - ext-alb-controller/aws-load-balancer-controller-prod-euw2-shared1
+  hooks:
+  - events:
+    - postsync
+    showlogs: true
+    command: kubectl
+    args: ["apply", "-f", "manifests/ingress.yaml"]
+  values:
+    # nginx ingress with service as ClusterIP
+    - controller:
+        service:
+          type: NodePort
+        resources:
+          ##  limits:
+          ##    cpu: 100m
+          ##    memory: 90Mi
+          requests:
+            cpu: 100m
+            memory: 200Mi
+        autoscaling:
+          enabled: true
+          minReplicas: 1
+          maxReplicas: 2
+          targetCPUUtilizationPercentage: 100
+          targetMemoryUtilizationPercentage: 100
+        maxUnavailable: 1
+        metrics:
+          enabled: true
+          service:
+            annotations:
+              prometheus.io/scrape: "true"
+              prometheus.io/port: "10254"
+
+- chart: metrics-server/metrics-server
+  name: metrics-server-prod-euw2-shared1
+  namespace: ext-metrics-server
+  version: "3.11.0"
+  values:
+    - replicas: "1"
+
+- chart: external-secrets/external-secrets
+  name: external-secrets-prod-euw2-shared1
+  namespace: ext-external-secrets
+  version: "0.9.9"
+  hooks:
+  - events:
+    - postsync
+    showlogs: true
+    command: kubectl
+    args: ["apply", "-f", "manifests/cluster-secret-store.yaml"]
+  values:
+    - serviceAccount:
+        name: external-secrets
+        annotations:
+          eks.amazonaws.com/role-arn: "arn:aws:iam::392347600144:role/external-secrets-prod-euw2-shared1"
+
+
+- chart: prometheus-community/kube-prometheus-stack
+  name: kps-prod-euw2-shared1
+  namespace: ext-kube-prometheus
+  installed: false
+  version: "54.0.1"
+  needs:
+    - ext-ingress-nginx/ingress-nginx-prod-euw2-shared1
+  # values:
+  #   - values/prod-euw2-shared1-kube-prometheus-stack.yaml
+
+- chart: eks/aws-load-balancer-controller
+  name: aws-load-balancer-controller-prod-euw2-shared1
+  namespace: ext-alb-controller
+  version: "1.11.0"
+  hooks:
+  - events:
+    - presync
+    showlogs: true
+    command: kubectl
+    args: ["apply", "-f", "manifests/gp3-delete-encrypted.yaml"]
+  values:
+    - clusterName: prod-euw2-shared1
+    - serviceAccount:
+        create: true
+        annotations:
+          eks.amazonaws.com/role-arn: "arn:aws:iam::392347600144:role/load-balancer-controller-prod-euw2-shared1"
+        name: aws-load-balancer-controller
+
+- chart: argo/argo-cd
+  name: prod-euw2-shared1-argocd
+  namespace: ext-argocd
+  version: "7.8.0"
+  values:
+    - values/argocd.yaml
+  needs:
+    - ext-ingress-nginx/ingress-nginx-prod-euw2-shared1

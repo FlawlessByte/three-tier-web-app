@@ -1,0 +1,92 @@
+## Globally shared configuration
+global:
+  domain: argocd.flawlessbyte.dev
+
+## Argo Configs
+configs:
+  cm:
+    create: true
+    admin.enabled: true
+    exec.enabled: true
+    statusbadge.enabled: true
+    accounts.github-user: apiKey
+    accounts.github-user.enabled: true
+    server.rbac.log.enforce.enable: true
+
+  # Argo CD configuration parameters
+  ## Ref: https://github.com/argoproj/argo-cd/blob/master/docs/operator-manual/argocd-cmd-params-cm.yaml
+  params:
+    create: true
+
+    server.insecure: true
+    server.disable.auth: false
+    # reposerver.enable.git.submodule : false
+
+  rbac:
+    create: true
+    policy.default: role:github-user
+    policy.csv: |
+      p, role:github-user, applications, *, */*, allow 
+
+
+  # Argo CD sensitive data
+  # Ref: https://argo-cd.readthedocs.io/en/stable/operator-manual/user-management/#sensitive-data-and-sso-client-secrets
+  secret:
+    # -- Create the argocd-secret
+    createSecret: true
+    # -- Labels to be added to argocd-secret
+    labels: {}
+    # -- Annotations to be added to argocd-secret
+    annotations: {}
+
+    # -- Shared secret for authenticating GitHub webhook events
+    githubSecret: ""
+
+    # -- add additional secrets to be added to argocd-secret
+    ## Custom secrets. Useful for injecting SSO secrets into environment variables.
+    ## Ref: https://argo-cd.readthedocs.io/en/stable/operator-manual/user-management/#sensitive-data-and-sso-client-secrets
+    ## Note that all values must be non-empty.
+    extra:
+      {}
+      # LDAP_PASSWORD: "mypassword"
+
+    # -- Bcrypt hashed admin password
+    ## Argo expects the password in the secret to be bcrypt hashed. You can create this hash with
+    ## `htpasswd -nbBC 10 "" $ARGO_PWD | tr -d ':\n' | sed 's/$2y/$2a/'`
+    argocdServerAdminPassword: ""
+    # -- Admin password modification time. Eg. `"2006-01-02T15:04:05Z"`
+    # @default -- `""` (defaults to current time)
+    argocdServerAdminPasswordMtime: ""
+
+## Application controller
+controller:
+  replicas: 1
+
+## Server
+server:
+  autoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 1
+    targetCPUUtilizationPercentage: 100
+    targetMemoryUtilizationPercentage: 100
+
+
+  ingress:
+    enabled: true
+    controller: generic
+
+    ingressClassName: nginx
+
+## Repo Server
+repoServer:
+  autoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 1
+    targetCPUUtilizationPercentage: 100
+    targetMemoryUtilizationPercentage: 100
+
+## Notifications controller
+notifications:
+  enabled: false
