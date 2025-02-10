@@ -100,6 +100,7 @@ jobs:
 
       - name: Deploy via ArgoCD
         run: |
+          set -xeu
           argocd app set $ARGOCD_APP_NAME \
             -p image.tag=$VERSION \
             --server $ARGOCD_SERVER \
