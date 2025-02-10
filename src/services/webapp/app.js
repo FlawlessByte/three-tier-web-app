@@ -99,17 +99,18 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public'), {
-    // Set cache control headers for static files
-    maxAge: '1d',
-    etag: true
-}));
+app.use(express.static(path.join(__dirname, 'public')));
+// app.use(express.static(path.join(__dirname, 'public'), {
+//     // Set cache control headers for static files
+//     maxAge: '1d',
+//     etag: true
+// }));
 
 app.use('/', routes);
 
 // Custom 404 handler with proper cache headers
 app.use(function(req, res, next) {
-    res.set('Cache-Control', 'no-store');
+    // res.set('Cache-Control', 'no-store');
     var err = new Error('Not Found');
     err.status = 404;
     next(err);
@@ -118,7 +119,7 @@ app.use(function(req, res, next) {
 // Development error handler
 if (app.get('env') === 'development') {
     app.use(function(err, req, res, next) {
-        res.set('Cache-Control', 'no-store');
+        // res.set('Cache-Control', 'no-store');
         res.status(err.status || 500);
         res.render('error', {
             message: err.message,
