@@ -9,7 +9,7 @@ name: Deploy frontend
 on:
   push:
     branches: 
-      - main
+      # - main
       - release
     paths:
       - 'src/services/webapp/**'
@@ -85,7 +85,7 @@ jobs:
           context: ./src/services/webapp/
           file: ./src/services/webapp/ops/build/Dockerfile
           push: true
-          tags: "392347600144.dkr.ecr.eu-west-2.amazonaws.com/webapp:${{ github.ref_name }}-${{ github.run_id }}.${{ github.run_number }}.${{ github.run_attempt }}"
+          tags: "<AWS_ACC_ID>.dkr.ecr.eu-west-2.amazonaws.com/webapp:${{ github.ref_name }}-${{ github.run_id }}.${{ github.run_number }}.${{ github.run_attempt }}"
           # arm64 can be added here
           platforms: linux/amd64
 

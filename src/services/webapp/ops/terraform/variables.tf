@@ -78,7 +78,7 @@ variable "cloudfront_viewer_certificate" {
   description = "The SSL configuration for this distribution"
   type        = any
   default = {
-    acm_certificate_arn      = "arn:aws:acm:us-east-1:392347600144:certificate/b883070f-53a9-4775-ad6d-aaaeda9f8602"
+    acm_certificate_arn      = "arn:aws:acm:us-east-1:<AWS_ACC_ID>:certificate/b883070f-53a9-4775-ad6d-aaaeda9f8602"
     ssl_support_method       = "sni-only"
     minimum_protocol_version = "TLSv1.2_2018"
   }

@@ -61,7 +61,7 @@ releases:
     - serviceAccount:
         name: external-secrets
         annotations:
-          eks.amazonaws.com/role-arn: "arn:aws:iam::392347600144:role/external-secrets-prod-euw2-shared1"
+          eks.amazonaws.com/role-arn: "arn:aws:iam::<AWS_ACC_ID>:role/external-secrets-prod-euw2-shared1"
 
 
 - chart: prometheus-community/kube-prometheus-stack
@@ -89,7 +89,7 @@ releases:
     - serviceAccount:
         create: true
         annotations:
-          eks.amazonaws.com/role-arn: "arn:aws:iam::392347600144:role/load-balancer-controller-prod-euw2-shared1"
+          eks.amazonaws.com/role-arn: "arn:aws:iam::<AWS_ACC_ID>:role/load-balancer-controller-prod-euw2-shared1"
         name: aws-load-balancer-controller
 
 - chart: argo/argo-cd
